@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+        <style>
+            #content {
+                margin: auto;
+                width: 50%;
+                padding: 10px;
+                font-size: xx-large;
+            }
+            #yes {
+                background-color: #4CAF50;
+                font-size: xx-large;
+            }
+            #next {
+                background-color: skyblue;
+                font-size: xx-large;
+            }
+            #no {
+                background-color: #FF6F30;
+                font-size: xx-large;
+            }
+            #choice0 {
+                width: 20vw;
+            }
+            #choice1 {
+                width: 20vw;
+            }
+        </style>
+    </head>
+    <body>
+        <a class="github-fork-ribbon" href="https://github.com/MattCruikshank/pc_not_working" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+        <div id="content">
+            <center>
+                <div><text id="text"></text></div><p/><img id="reference_img" src="" /><p/>
+                <button id="yes">yes</button>
+                <button id="next">next</button>
+                <button id="no">no</button><p/>
+                <button id="choice0">
+                    <text id="choice0txt"></text><br />
+                    <img id="choice0img"/>
+                </button>
+                <button id="choice1">
+                    <text id="choice1txt"></text><br />
+                    <img id="choice1img"/>
+                </button>
+            </center>
+        </div>
+
+        <script>
+            /*
+            Original post: https://www.reddit.com/r/buildapcforme/comments/1hfm6w2/is_your_new_pc_not_working_heres_a_flowchart_on/
+            High-resolution: https://i.imgur.com/kDnLfMi.jpeg
+            */
+            const err = {
+                t: "Sorry, there's a problem with this website.",
+            };
+            const nodes = [
+                { id: "start", t: "Before we start, I would recommend turning off the PC before every next step, and turning it back on when the step is finished.", next: "fans", },
+                { id: "fans", t: "Do your fans spin and/or lights light up when you press the power button?", n: "powercable", y: "hdmi", },
+                { id: "hdmi", t: "Look at the back of your PC, and make sure your HDMI or DisplayPort cable is connected to the Graphics Card, and not the motherboard.  If available, try switching to DisplayPort if you're using HDMI.  Does this fix the issue?", r: "https://ms.codes/cdn/shop/articles/file-6cJufUJx8f.jpg?v=1707817995", y: "END"},
+                { id: "powercable", t: "Make sure the power cable from the power supply is connected to the wall, and the power switch on the back is switched to ON.", next: "boot" },
+                { id: "boot", t: "Does the PC boot up?", y: "END", n: "connectors", },
+                { id: "connectors", t: "Let's find the front panel connectors.  Start off by removing the left sidepanel of your case.  You can generally find the header(s) at the bottom right of the motherboard, and the needed cables will come from the top or front of your inside of your PC - where your power button is.", next: "connectors_look", },
+                { id: "connectors_look", t: "What do your front panel connectors look like?", choices: [
+                    { img: "https://pcinq.com/wp-content/uploads/2022/06/front-panel-connector_separate.webp", t: "Like this", next: "seperate"},
+                    { img: "https://pcinq.com/wp-content/uploads/2022/06/front-panel-connector_combined.webp", t: "Like that", next: "combined", }
+                ] },
+                { id: "END", t: "Congratulations!", },
+            ];
+            function get(s) {
+                for (const node of nodes) {
+                    if (node.id == s) return node;
+                }
+                return err;
+            }
+            let state = get("start");
+
+            function run(stateName)
+            {
+                state = get(stateName);
+                console.log(stateName);
+                // console.log(JSON.stringify(state, null, " "));
+
+                if ("t" in state) {
+                    text.innerHTML = state.t;
+                } else {
+                    text.innerHTML = "Please choose from the following options";
+                }
+
+                reference_img.style.display = ("r" in state) ? "block" : "none";
+                if ("r" in state)
+                {
+                    reference_img.src = state.r;
+                }
+
+                choice0.style.display = "none";
+                choice1.style.display = "none";
+
+                yes.style.display = ("y" in state) ? "inline" : "none";
+                next.style.display = ("next" in state) ? "inline" : "none";
+                no.style.display = ("n" in state) ? "inline" : "none";
+
+                if ("choices" in state) {
+
+                }
+            }
+
+            function initialize() {
+                run("start");
+
+                yes.addEventListener("click", () => { run(state.y); });
+                next.addEventListener("click", () => { run(state.next); });
+                no.addEventListener("click", () => { run(state.n); });
+                choice0.addEventListener("click", () => { run(state.choices[0].next); });
+                choice1.addEventListener("click", () => { run(state.choices[1].next); });
+            }
+
+            document.addEventListener('DOMContentLoaded', () => { initialize(); });
+        </script>
+    </body>
+</html>
